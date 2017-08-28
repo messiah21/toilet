@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="toilet.use.hist.Info">
+	<!-- toilet hist -->
+	<resultMap id="toilietUseHistInfo" type="com.raon.toilet.vo.ToiletUseHist" >
+		<result property="useId"			column="USEID" />
+		<result property="sensorId"			column="SENSORID" />
+		<result property="floor"			column="FLOOR" />
+		<result property="container"		column="CONTAINER" />
+		<result property="startDt"			column="STARTDT" />
+		<result property="endDt"			column="ENDDT" />
+	</resultMap>
+	
+	
+	<select id="selectToiletUseHist" parameterType="java.util.Map" resultMap="toilietUseHistInfo">
+		SELECT
+			USEID
+			, SENSORID
+			, FLOOR
+			, CONTAINER
+			, STARTDT
+			, ENDDT
+		 FROM TOILET_USE_HIST
+		WHERE 1=1
+		<if test="floor != null and floor != '' " >
+		 	AND FLOOR = #{floor}
+		</if>
+		<if test="container != null and container != '' " >
+		 	AND CONTAINER = #{container}
+		</if>
+		<if test="sensorId != null and sensorId != '' " >
+		 	AND SENSORID = #{sensorId}
+		</if>
+		<if test="sensorId != null and sensorId != '' " >
+		 	AND USEID = #{useId}
+		</if>
+	</select>
+	
+	
+	<insert id="insertToiletUseHist" parameterType="java.util.Map">
+		INSERT INTO TOILET_USE_HIST 
+		(
+			USEID
+			, SENSORID
+			, FLOOR
+			, CONTAINER
+			, STARTDT
+		)
+		SELECT 
+			USEID
+			, SENSORID
+			, FLOOR
+			, CONTAINER
+			, UDT
+		 FROM TOILET_STATUS
+		WHERE SENSORID = #{sensorId}
+	</insert>
+	
+	<update id="updateToiletUseHistEndDt" parameterType="java.util.Map">
+		update TOILET_USE_HIST 
+		SET
+			ENDDT = #{endDt}
+		WHERE SENSORID = #{sensorId}
+		  AND USEID = #{useId}
+	</update>
+</mapper>

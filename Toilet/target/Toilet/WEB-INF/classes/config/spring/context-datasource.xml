@@ -1,0 +1,63 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:context="http://www.springframework.org/schema/context" xmlns:jee="http://www.springframework.org/schema/jee"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+
+	<context:component-scan base-package="com.raon.toilet" />
+
+	<bean id="dataSourceSpied" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${toilet.jdbc.driverClassName}" />
+		<property name="url" value="${toilet.jdbc.url}" />
+		<property name="username" value="${toilet.jdbc.username}" />
+		<property name="password" value="${toilet.jdbc.password}" />
+		<property name="validationQuery" value="${toilet.jdbc.testquery}" />
+		<property name="maxActive" value="${toilet.jdbc.maxActive}" />
+		<property name="initialSize" value="${toilet.jdbc.initialSize}" />
+		<property name="minIdle" value="${toilet.jdbc.minIdle}" />
+		<property name="maxIdle" value="${toilet.jdbc.maxIdle}" />
+		<property name="maxWait" value="${toilet.jdbc.maxWait}" />
+	</bean>
+	
+	<bean id="jndiFactorySpied" class="com.raon.toilet.common.jndi.ExJndiObjectFactoryBean">
+		<property name="jndiName" 	value="${toilet.jdbc.jndiName}"/>
+		<property name="useYn" 		value="${toilet.jdbc.was.pool.use}"/>
+		<property name="wasType" 	value="${toilet.jdbc.pool.wasType}"/>
+		<property name="proxyInterface" value="javax.sql.DataSource" />
+	</bean>	
+	
+    <bean id="dataSource" class="net.sf.log4jdbc.Log4jdbcProxyDataSource">
+        <constructor-arg ref="#{'${toilet.jdbc.was.pool.use}' == 'Y' ? 'jndiFactorySpied' : 'dataSourceSpied'}" />
+        <property name="logFormatter">
+            <bean class="net.sf.log4jdbc.tools.Log4JdbcCustomFormatter">
+                <property name="loggingType" value="MULTI_LINE" />
+                <property name="sqlPrefix" value="SQL::====>  "/>
+            </bean>
+        </property>
+    </bean>
+    
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> 
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="${toilet.jdbc.sqlmap}" />
+		<!--property name="mapperLocations" value="${toilet.jdbc.sqlmap.query}"/-->
+	</bean>
+	
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">        
+    	<constructor-arg  ref="sqlSessionFactory"/>    
+    </bean>	
+	
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<bean id="txUtil" class="com.raon.toilet.common.util.TxUtil">
+		<property name="txManager" ref="transactionManager" />
+	</bean>
+		   
+</beans>

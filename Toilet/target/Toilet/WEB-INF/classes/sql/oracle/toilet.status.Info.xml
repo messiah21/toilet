@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="toilet.status.info">
+	<!-- 센서 정보  -->
+	<resultMap id="toilietSensorInfo" type="com.raon.toilet.vo.ToiletSensorInfo" >
+		<result property="sensorId"			column="SENSORID"	/>
+		<result property="floor"			column="FLOOR"		/>
+		<result property="contailner"		column="CONTAINER"	/>
+		<result property="status"			column="STATUS"		/>
+	</resultMap>
+	<!-- toilet 상태 -->
+	<resultMap id="toiletStatus" type="com.raon.toilet.vo.ToiletStatus" >
+		<result property="floor"			column="FLOOR" />
+		<result property="container"		column="CONTAINER" />
+		<result property="status"			column="STATUS" />
+		<result property="sensorId"			column="SENSORID" />
+		<result property="udt"				column="UDT" />
+		<result property="useId"			column="USEID" />
+	</resultMap>
+
+	
+	
+	<select id="selectSensorInfo" parameterType="java.util.Map" resultMap="toilietSensorInfo">
+		SELECT 
+			SENSORID
+			, FLOOR
+			, CONTAINER
+			, STATUS
+		FROM TOILET_SENSOR_INFO
+		WHERE 1=1
+		<if test="sensorId != null and sensorId != '' " >
+		  AND SENSORID = #{sensorId}
+		</if>
+	</select>
+	
+	<select id="selectToiletStatus" parameterType="java.util.Map" resultMap="toiletStatus">
+		SELECT 
+			FLOOR
+			, CONTAINER
+			, STATUS
+			, SENSORID
+			, UDT
+			, USEID
+	 	 FROM TOILET_STATUS
+		WHERE 1=1
+		<if test="floor != null and floor != '' " >
+		 	AND FLOOR = #{floor}
+		</if>
+		<if test="container != null and container != '' " >
+		 	AND CONTAINER = #{container}
+		</if>
+		<if test="sensorId != null and sensorId != '' " >
+		 	AND SENSORID = #{sensorId}
+		</if>
+	</select>
+	
+	
+	
+	<update id="updateToiletStatus" parameterType="java.util.Map">
+		UPDATE TOILET_STATUS
+		SET 
+			STATUS = #{toiletStatus}
+			, UDT = #{updateTime}
+		<if test="useId != null " >
+			, USEID = #{useId}
+		</if>
+		WHERE SENSORID = #{sensorId}
+		<if test="floor != null and floor != '' " >
+		 	AND FLOOR = #{floor}
+		</if>
+		<if test="container != null and container != '' " >
+		 	AND CONTAINER = #{container}
+		</if>
+	</update>
+	
+	
+	
+	
+</mapper>
