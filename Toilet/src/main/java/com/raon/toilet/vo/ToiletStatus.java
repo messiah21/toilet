@@ -3,7 +3,7 @@ package com.raon.toilet.vo;
 public class ToiletStatus {
 	private int floor;
 	private int container;
-	private String status;
+	private int status;
 	private String sensorId;
 	private String udt;
 	private String useId;
@@ -22,10 +22,10 @@ public class ToiletStatus {
 	public void setContainer(int container) {
 		this.container = container;
 	}
-	public String getStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(String status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 	public String getSensorId() {
